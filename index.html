@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MCU en orden cronológico</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#d62828">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+:root{--bg:#f6f6f8;--card:#fff;--tx:#1b1b1f;--mut:#6b6b76;--ac:#d62828;--ok:#2a9d4f;--bd:#e2e2e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121214;--card:#1c1c20;--tx:#ececf1;--mut:#9a9aa6;--ac:#ef4444;--ok:#3ecf72;--bd:#2c2c33}}
+:root[data-theme="dark"]{--bg:#121214;--card:#1c1c20;--tx:#ececf1;--mut:#9a9aa6;--ac:#ef4444;--ok:#3ecf72;--bd:#2c2c33}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:680px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;margin:0 0 4px}
+.sub{color:var(--mut);font-size:.9rem;margin-bottom:12px}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+#cnt{font-size:.9rem;margin:6px 0 12px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+button,select{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font:inherit}
+button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer}
+li.seen{opacity:.6}
+li.seen .t{text-decoration:line-through}
+.n{color:var(--mut);width:2em;text-align:right;font-size:.85rem}
+input{width:22px;height:22px;accent-color:var(--ok)}
+.t{flex:1}
+.m{font-size:.8rem;color:var(--mut)}
+.tag{font-size:.7rem;border:1px solid var(--bd);border-radius:6px;padding:1px 6px;color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+<h1>MCU en orden cronológico</h1>
+<div class="sub">Toca un título para marcarlo como visto. Tu progreso se guarda en este navegador.</div>
+<div class="bar"><i id="b"></i></div>
+<div id="cnt"></div>
+<div class="tools">
+<button data-f="all" class="on">Todo</button>
+<button data-f="no">Pendientes</button>
+<button data-f="si">Vistos</button>
+<select id="ty"><option value="">Pelis y series</option><option>Película</option><option>Serie</option></select>
+<button id="rs">Reiniciar</button>
+</div>
+<ul id="l"></ul>
+</main>
+<script>
+// Formato: "Tipo|Título|Año de estreno". Edita o reordena esta lista a tu gusto.
+var D=`Película|Capitán América: El primer vengador|2011
+Película|Capitana Marvel|2019
+Película|Iron Man|2008
+Película|Iron Man 2|2010
+Película|El increíble Hulk|2008
+Película|Thor|2011
+Película|Los Vengadores|2012
+Película|Thor: El mundo oscuro|2013
+Película|Iron Man 3|2013
+Película|Capitán América: El soldado de invierno|2014
+Película|Guardianes de la Galaxia|2014
+Película|Guardianes de la Galaxia Vol. 2|2017
+Película|Vengadores: La era de Ultrón|2015
+Película|Ant-Man|2015
+Película|Capitán América: Civil War|2016
+Película|Viuda Negra|2021
+Película|Black Panther|2018
+Película|Spider-Man: Homecoming|2017
+Película|Doctor Strange|2016
+Película|Thor: Ragnarok|2017
+Película|Ant-Man y la Avispa|2018
+Película|Vengadores: Infinity War|2018
+Película|Vengadores: Endgame|2019
+Película|Spider-Man: Lejos de casa|2019
+Serie|Loki (T1)|2021
+Serie|WandaVision|2021
+Serie|Falcon y el Soldado de Invierno|2021
+Película|Shang-Chi y la leyenda de los Diez Anillos|2021
+Película|Eternals|2021
+Serie|Hawkeye|2021
+Serie|Moon Knight|2022
+Serie|Ms. Marvel|2022
+Película|Spider-Man: Sin camino a casa|2021
+Película|Doctor Strange en el multiverso de la locura|2022
+Película|Thor: Amor y trueno|2022
+Película|Black Panther: Wakanda Forever|2022
+Película|Werewolf by Night|2022
+Película|Especial de Guardianes: Felices fiestas|2022
+Película|Ant-Man y la Avispa: Quantumania|2023
+Película|Guardianes de la Galaxia Vol. 3|2023
+Serie|Secret Invasion|2023
+Serie|Loki (T2)|2023
+Película|The Marvels|2023
+Serie|Echo|2024
+Película|Deadpool y Wolverine|2024
+Serie|Agatha, ¿quién más?|2024
+Película|Capitán América: Un nuevo mundo|2025
+Película|Thunderbolts*|2025
+Serie|Daredevil: Born Again (T1)|2025
+Serie|Ironheart|2025
+Película|Los 4 Fantásticos: Primeros pasos|2025
+Serie|Wonder Man|2026
+Serie|Daredevil: Born Again (T2)|2026
+Película|Spider-Man: Brand New Day|2026
+Película|Vengadores: Doomsday|2026`.split("\n").map(function(x){var p=x.split("|");return{t:p[0],n:p[1],y:p[2]}});
+var K="mcu-vistos",S={},F="all",T="";
+try{S=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){S={}}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function render(){
+var l=document.getElementById("l");l.innerHTML="";var v=0;
+D.forEach(function(d,i){
+var s=!!S[d.n];if(s)v++;
+if(F==="no"&&s||F==="si"&&!s||T&&d.t!==T)return;
+var li=document.createElement("li");li.className=s?"seen":"";
+li.innerHTML='<span class="n">'+(i+1)+'</span><input type="checkbox" '+(s?"checked":"")+'><div class="t">'+d.n+'<div class="m">'+d.y+' <span class="tag">'+d.t+'</span></div></div>';
+li.onclick=function(){S[d.n]=!S[d.n];save();render()};
+l.appendChild(li)});
+document.getElementById("b").style.width=(v/D.length*100)+"%";
+document.getElementById("cnt").textContent=v+" de "+D.length+" vistos ("+Math.round(v/D.length*100)+"%)";
+}
+document.querySelectorAll("[data-f]").forEach(function(b){b.onclick=function(){F=b.dataset.f;document.querySelectorAll("[data-f]").forEach(function(x){x.classList.toggle("on",x===b)});render()}});
+document.getElementById("ty").onchange=function(e){T=e.target.value;render()};
+document.getElementById("rs").onclick=function(){if(confirm("¿Borrar todo tu progreso?")){S={};save();render()}};
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){})})}
+</script>
+</body>
+</html>

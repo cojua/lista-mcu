@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MCU en orden cronológico</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#e62429">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#09090c;--card:#14141a;--tx:#f2f2f5;--mut:#9a9aa8;--ac:#e62429;--gold:#f5c518;--bd:#2a2a33;--f:"Bebas Neue",Impact,"Arial Narrow",sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--tx);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg) radial-gradient(ellipse at 50% -10%,#5a0d10 0,#1b0709 38%,var(--bg) 70%) fixed no-repeat;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65) 100%)}
+main{max-width:680px;margin:0 auto;padding:16px;position:relative;z-index:1}
+.hero{text-align:center;padding:10px 0 14px;border-bottom:1px solid var(--bd);margin-bottom:14px}
+.logo{display:inline-block;position:relative;overflow:hidden;background:var(--ac);color:#fff;font:400 3.2rem/1 var(--f);letter-spacing:.1em;padding:4px 20px 2px;transform:skewX(-6deg);animation:glow 3s ease-in-out infinite}
+.logo::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:shine 4s ease-in-out infinite}
+h1{font:400 2rem/1.1 var(--f);letter-spacing:.2em;text-transform:uppercase;margin:12px 0 6px;background:linear-gradient(180deg,#fff 30%,#f5c518 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 10px rgba(230,36,41,.7))}
+.sub{color:var(--mut);font-size:.85rem}
+.bar{height:12px;background:#22222b;border-radius:3px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--bd)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--gold),var(--ac));background-size:200% 100%;box-shadow:0 0 14px rgba(245,197,24,.7);transition:width .4s;animation:flow 3s linear infinite}
+#cnt{font:400 1.1rem var(--f);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:8px 0 14px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+button,select{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:4px;padding:8px 12px;font:inherit;text-transform:uppercase;letter-spacing:.06em;font-size:.8rem;transition:box-shadow .15s,background .15s}
+button:active{transform:scale(.96)}
+button.on{background:var(--ac);color:#fff;border-color:var(--ac);box-shadow:0 0 14px rgba(230,36,41,.6)}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:center;gap:10px;background:linear-gradient(100deg,#1d1d25,var(--card));border:1px solid var(--bd);border-left:4px solid var(--ac);border-radius:4px;padding:10px 12px;margin-bottom:9px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.45);transition:transform .15s,box-shadow .15s}
+li:active{transform:scale(.985)}
+li:hover{border-color:#3d3d4a;box-shadow:0 0 18px rgba(230,36,41,.25)}
+li.seen{border-left-color:var(--gold);box-shadow:0 0 16px rgba(245,197,24,.12)}
+li.seen .t{color:var(--mut)}
+.n{font:400 1.5rem var(--f);color:#4a4a58;width:1.5em;text-align:center;flex:none}
+li.seen .n{color:var(--gold)}
+input{appearance:none;-webkit-appearance:none;width:24px;height:24px;border:2px solid #4a4a58;border-radius:50%;margin:0;flex:none;display:grid;place-content:center}
+input:checked{background:linear-gradient(135deg,var(--gold),#c98f00);border-color:var(--gold);box-shadow:0 0 10px rgba(245,197,24,.7)}
+input:checked::after{content:"\2713";color:#111;font-weight:900;font-size:15px}
+.t{flex:1;font:400 1.35rem/1.15 var(--f);letter-spacing:.05em;text-transform:uppercase}
+.m,.lore,.tag,.inf{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;letter-spacing:normal;text-transform:none}
+.m{font-size:.8rem;color:var(--mut);margin-top:2px}
+.tag{font-size:.65rem;border:1px solid var(--bd);border-radius:3px;padding:1px 6px;text-transform:uppercase;letter-spacing:.08em}
+.tag.pe{color:var(--gold);border-color:rgba(245,197,24,.5)}
+.tag.se{color:#5ab0ff;border-color:rgba(90,176,255,.5)}
+.inf{padding:2px 8px;font-size:.7rem;margin-left:4px;text-transform:uppercase}
+.lore{font-size:.85rem;margin-top:8px;color:#d6d6de;border-left:3px solid var(--gold);padding-left:8px;background:rgba(245,197,24,.05)}
+.lore[hidden]{display:none}
+.lore:not([hidden]){animation:drop .25s ease-out}
+.ver{text-align:center;color:var(--mut);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;margin:18px 0 6px;opacity:.6}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+::selection{background:var(--ac);color:#fff}
+@keyframes glow{0%,100%{box-shadow:0 0 18px rgba(230,36,41,.45)}50%{box-shadow:0 0 34px rgba(230,36,41,.9)}}
+@keyframes shine{0%,55%{left:-60%}100%{left:130%}}
+@keyframes flow{to{background-position:-200% 0}}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero"><div class="logo">MCU</div><h1>Orden cronológico</h1>
+<div class="sub">Toca un título para marcarlo como visto. Toca ℹ️ Lore para ver el contexto (puede tener spoilers).</div></header>
+<div class="bar"><i id="b"></i></div>
+<div id="cnt"></div>
+<div class="tools">
+<button data-f="all" class="on">Todo</button>
+<button data-f="no">Pendientes</button>
+<button data-f="si">Vistos</button>
+<select id="ty"><option value="">Pelis y series</option><option>Película</option><option>Serie</option></select>
+<button id="rs">Reiniciar</button>
+</div>
+<ul id="l"></ul>
+<div class="ver">Versión 4</div>
+</main>
+<script>
+// Formato: "Tipo|Título|Año de estreno". Edita o reordena esta lista a tu gusto.
+var D=`Película|Capitán América: El primer vengador|2011|Segunda Guerra Mundial: Steve Rogers recibe el suero de supersoldado y combate a Cráneo Rojo (Hydra), que usa el Teseracto, la Gema del Espacio.
+Película|Capitana Marvel|2019|Años 90: Carol Danvers gana poderes cósmicos entre kree y skrulls. Conoce a Nick Fury y de ahí nace la idea de los Vengadores.
+Película|Iron Man|2008|Tony Stark, fabricante de armas, construye su primera armadura y deja ese negocio. Es el inicio de todo el MCU.
+Película|Iron Man 2|2010|Tony revela que es Iron Man mientras su reactor lo envenena. Aparecen Viuda Negra y S.H.I.E.L.D. armando la Iniciativa Vengadores.
+Película|El increíble Hulk|2008|Bruce Banner huye del ejército tras el accidente gamma que lo convierte en Hulk. Presenta al general Ross.
+Película|Thor|2011|Odín destierra a su hijo Thor a la Tierra para que aprenda humildad. Presenta Asgard, el Bifrost y a Loki.
+Película|Los Vengadores|2012|Loki invade Nueva York con los Chitauri y el equipo se une por primera vez. La escena final presenta a Thanos.
+Película|Thor: El mundo oscuro|2013|Los elfos oscuros buscan el Éter, la Gema de la Realidad. Thor y Loki se alían y la gema queda con el Coleccionista.
+Película|Iron Man 3|2013|Tony sufre estrés postraumático tras Nueva York y enfrenta a Extremis y al Mandarín. Termina destruyendo sus armaduras.
+Película|Capitán América: El soldado de invierno|2014|Cap descubre que Hydra infiltró S.H.I.E.L.D. y que su amigo Bucky es el Soldado del Invierno. S.H.I.E.L.D. cae.
+Película|Guardianes de la Galaxia|2014|Peter Quill y un grupo de marginados cósmicos protegen el Orbe, que guarda la Gema del Poder, de Ronan. Thanos mueve los hilos.
+Película|Guardianes de la Galaxia Vol. 2|2017|Peter conoce a su padre, Ego, un Celestial. Trata de la familia elegida; Groot vuelve como bebé.
+Película|Vengadores: La era de Ultrón|2015|Tony crea a Ultrón, una IA que quiere acabar con la humanidad. Nacen Visión (con la Gema de la Mente) y Wanda y Pietro.
+Película|Ant-Man|2015|Scott Lang, un ladrón, hereda el traje de Hank Pym que encoge. Presenta el Reino Cuántico.
+Película|Capitán América: Civil War|2016|Los Acuerdos de Sokovia dividen a los Vengadores: Iron Man contra Capitán América. Debutan Black Panther y Spider-Man.
+Película|Viuda Negra|2021|Ocurre tras Civil War: Natasha enfrenta a la Habitación Roja y se reúne con su 'hermana' Yelena.
+Película|Black Panther|2018|T'Challa asume el trono de Wakanda, nación oculta rica en vibranium, y enfrenta a Killmonger.
+Película|Spider-Man: Homecoming|2017|Peter Parker, adolescente tutelado por Tony Stark, enfrenta al Buitre, un traficante de tecnología alienígena.
+Película|Doctor Strange|2016|El cirujano Stephen Strange aprende artes místicas y obtiene el Ojo de Agamotto, la Gema del Tiempo.
+Película|Thor: Ragnarok|2017|Hela, hermana de Thor, destruye Asgard. Thor se une a Hulk y los asgardianos huyen a la Tierra.
+Película|Ant-Man y la Avispa|2018|Scott, Hope y Hank rescatan a Janet del Reino Cuántico. La escena final ocurre durante el Chasquido.
+Película|Vengadores: Infinity War|2018|Thanos reúne las Gemas del Infinito para eliminar a la mitad de la vida del universo. Termina con el Chasquido.
+Película|Vengadores: Endgame|2019|Cinco años después, los Vengadores viajan en el tiempo para recuperar las Gemas y revertir el Chasquido. Cierra la Saga del Infinito.
+Película|Spider-Man: Lejos de casa|2019|Tras la muerte de Tony, Peter enfrenta a Mysterio en Europa. Al final, su identidad queda expuesta.
+Serie|Loki (T1)|2021|Un Loki de 2012 es capturado por la AVT, que vigila el tiempo. Descubre las ramas temporales y aparece Kang, base del multiverso.
+Serie|Loki (T2)|2023|Loki y la AVT intentan evitar que el multiverso colapse. Continúa directo de T1; Kang sigue acechando.
+Serie|What If...? (T1)|2021|Serie animada: el Vigilante muestra realidades alternas donde un hecho clave cambia, como Peggy convertida en Capitana Carter.
+Serie|WandaVision|2021|Wanda crea una sitcom ilusoria en Westview tras perder a Visión. Presenta a Agatha y conecta con Doctor Strange 2.
+Serie|Falcon y el Soldado de Invierno|2021|Sam recibe el escudo y decide si ser el nuevo Capitán América. Bucky y él enfrentan a los Flag Smashers y a John Walker.
+Película|Shang-Chi y la leyenda de los Diez Anillos|2021|Shang-Chi enfrenta a su padre, líder de los Diez Anillos, y descubre un mundo místico oculto.
+Película|Eternals|2021|Seres inmortales enviados por los Celestiales protegen a la humanidad hace miles de años de los Desviantes.
+Serie|Hawkeye|2021|Clint Barton y Kate Bishop, en plena Navidad en Nueva York, enfrentan a la mafia. Debuta Kingpin.
+Serie|Moon Knight|2022|Marc Spector, con identidades múltiples, es avatar del dios egipcio Khonshu. Trae la mitología egipcia al MCU.
+Serie|Ms. Marvel|2022|Kamala Khan, fan de los Vengadores en Nueva Jersey, descubre sus poderes. Se conecta con Capitana Marvel.
+Serie|She-Hulk: Attorney at Law|2022|Jennifer Walters, prima de Bruce, es abogada y gana poderes de Hulk. Comedia legal con cameos importantes.
+Película|Spider-Man: Sin camino a casa|2021|Peter pide a Strange que borre su identidad y el hechizo abre el multiverso. Llegan villanos de otras películas de Spider-Man.
+Película|Doctor Strange en el multiverso de la locura|2022|Strange y America Chavez huyen por el multiverso de Wanda, que busca su poder. Explica las incursiones.
+Película|Thor: Amor y trueno|2022|Gorr, el Carnicero de Dioses, mata dioses. Thor busca su rumbo y Jane Foster empuña a Mjolnir.
+Película|Black Panther: Wakanda Forever|2022|Wakanda, en duelo por T'Challa, enfrenta a Namor, rey del reino submarino de Talokan.
+Película|Werewolf by Night|2022|Especial de terror en blanco y negro: cazadores de monstruos compiten por la Piedra de la Sangre.
+Película|Especial de Guardianes: Felices fiestas|2022|Drax y Mantis viajan a la Tierra para darle a Peter una Navidad inolvidable. Tono ligero.
+Película|Ant-Man y la Avispa: Quantumania|2023|La familia queda atrapada en el Reino Cuántico, donde reina Kang el Conquistador, villano de la Saga del Multiverso.
+Película|Guardianes de la Galaxia Vol. 3|2023|Los Guardianes salvan a Rocket de su creador, el Alto Evolucionador. Cierre del equipo.
+Serie|What If...? (T2)|2023|Más historias alternas contadas por el Vigilante, con nuevos héroes y villanos cambiados.
+Serie|Secret Invasion|2023|Nick Fury descubre que skrulls rebeldes, liderados por Gravik, se infiltraron en la Tierra.
+Película|The Marvels|2023|Carol, Monica Rambeau y Kamala intercambian de lugar cada vez que usan sus poderes. Une varias series.
+Serie|Echo|2024|Maya Lopez, sorda y de la nación choctaw, vuelve a su pueblo tras enfrentar a Kingpin.
+Serie|What If...? (T3)|2024|Última temporada de la serie animada; cierra la historia del Vigilante.
+Serie|X-Men '97 (opcional)|2024|Continúa la serie animada de los años 90: los mutantes y el prejuicio. Podría no encajar en la línea principal.
+Película|Deadpool y Wolverine|2024|La AVT recluta a Wade Wilson para salvar su universo. Mezcla el MCU con personajes de las películas de Fox.
+Serie|Agatha, ¿quién más?|2024|Agatha Harkness, sin poderes tras WandaVision, recorre el Camino de las Brujas con un joven aprendiz.
+Película|Capitán América: Un nuevo mundo|2025|Sam Wilson como Capitán América enfrenta una conspiración con Ross, ahora presidente. Introduce el adamantium.
+Película|Thunderbolts*|2025|Antihéroes como Yelena, Bucky y John Walker deben trabajar juntos. Continúa lo visto en Viuda Negra.
+Serie|Daredevil: Born Again (T1)|2025|Matt Murdock, abogado y justiciero, enfrenta a Wilson Fisk, ahora candidato a alcalde de Nueva York.
+Serie|Ironheart|2025|Riri Williams, genio adolescente de Chicago, construye su propia armadura y se topa con la magia.
+Serie|Your Friendly Neighborhood Spider-Man (T1)|2025|Serie animada: Peter Parker es tutelado por Norman Osborn en una Nueva York alterna.
+Película|Los 4 Fantásticos: Primeros pasos|2025|Una Tierra paralela retrofuturista, donde la familia enfrenta a Galactus. Debut de los 4 en el MCU.
+Serie|Eyes of Wakanda|2025|Serie animada sobre los Hatut Zeraze, guerreros de Wakanda, a través de la historia.
+Serie|Marvel Zombies|2025|Serie animada de terror en un universo infectado por zombis, nacida de un episodio de What If...?
+Serie|Wonder Man|2026|Simon Williams, un aspirante a actor con superpoderes, entra a Hollywood. Trevor Slattery vuelve.
+Serie|Daredevil: Born Again (T2)|2026|Continúa el choque entre Matt Murdock y Kingpin por el control de Nueva York.
+Película|The Punisher: One Last Kill (especial)|2026|Especial de una hora: Frank Castle (Jon Bernthal) en un último caso. Conecta con Daredevil.
+Película|Spider-Man: Brand New Day|2026|Peter empieza de cero tras el hechizo de Strange que borró su identidad. Conecta con el Punisher.
+Serie|VisionQuest|2026|Continúa WandaVision: sigue a Visión tras ser reconstruido, con Ultrón de regreso.
+Película|Vengadores: Doomsday|2026|Primer gran evento de la nueva era: Doctor Doom (Robert Downey Jr.) es el villano y Steve Rogers regresa. Aún no se estrena.`.split("\n").map(function(x){var p=x.split("|");return{t:p[0],n:p[1],y:p[2],l:p[3]}});
+var K="mcu-vistos",S={},F="all",T="";
+try{S=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){S={}}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function render(){
+var l=document.getElementById("l");l.innerHTML="";var v=0;
+D.forEach(function(d,i){
+var s=!!S[d.n];if(s)v++;
+if(F==="no"&&s||F==="si"&&!s||T&&d.t!==T)return;
+var li=document.createElement("li");li.className=s?"seen":"";
+li.innerHTML='<span class="n">'+(i+1)+'</span><input type="checkbox" '+(s?"checked":"")+'><div class="t">'+d.n+'<div class="m">'+d.y+' <span class="tag '+(d.t==="Serie"?"se":"pe")+'">'+d.t+'</span> <button class="inf" type="button">ℹ️ Lore</button></div><div class="lore" hidden>'+d.l+'</div></div>';
+li.querySelector(".inf").onclick=function(e){e.stopPropagation();var b=li.querySelector(".lore");b.hidden=!b.hidden};
+li.onclick=function(){S[d.n]=!S[d.n];save();render()};
+l.appendChild(li)});
+document.getElementById("b").style.width=(v/D.length*100)+"%";
+document.getElementById("cnt").textContent=v+" de "+D.length+" vistos ("+Math.round(v/D.length*100)+"%)";
+}
+document.querySelectorAll("[data-f]").forEach(function(b){b.onclick=function(){F=b.dataset.f;document.querySelectorAll("[data-f]").forEach(function(x){x.classList.toggle("on",x===b)});render()}});
+document.getElementById("ty").onchange=function(e){T=e.target.value;render()};
+document.getElementById("rs").onclick=function(){if(confirm("¿Borrar todo tu progreso?")){S={};save();render()}};
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){})})}
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 App web para ver el MCU en orden cronológico, marcar lo que ya viste y leer un resumen del lore de cada título.
 
-🌐 https://cojua.github.io/lista-mcu/
+🌐 https://cojua.github.io/lista-mcu/?=9
 
 ## Cómo se hizo
 Esta aplicación fue creada con ayuda de inteligencia artificial (Claude, de Anthropic). El contenido de los resúmenes de lore se generó con IA y puede contener errores; verifica los datos importantes en fuentes oficiales.
